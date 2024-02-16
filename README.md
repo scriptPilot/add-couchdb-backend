@@ -1,4 +1,4 @@
-# Add PHP Backend
+# Add CouchDB Backend
 
 Add [CouchDB](https://couchdb.apache.org/) and [PouchDB](https://pouchdb.com/) to your local development environment.
 
@@ -48,7 +48,7 @@ Add [CouchDB](https://couchdb.apache.org/) and [PouchDB](https://pouchdb.com/) t
 
 - **no dependency** will be added to the repository (only PouchDB itself)
 - you have **full control** of all source files for fine tuning
-- running `npx add-php-backend` will download the package in a cache folder
+- running `npx add-couchdb-backend` will download the package in a cache folder
   - the package will create a `docker/` folder with the Dockerfile
   - the package will create a `docker-composer.yml` file to configure the container setup
   - the package will add a `backend` script to the `package.json` file
