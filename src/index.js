@@ -15,9 +15,25 @@ const templateFolder = path.resolve(scriptFolder, 'templates')
 
 // Define files
 const packageFile = path.resolve(appFolder, 'package.json')
+let viteConfigFile = null
+
+// Ensure app folder (especially for development)
+fs.ensureDirSync(appFolder)
 
 // Copy template structure
 shell.exec(`cp -Rn "${templateFolder}/" "${appFolder}/"`)
+
+// Search for vite config file
+viteConfigFile =
+  fs.readdirSync(appFolder)
+  .filter(f => f.startsWith('vite.config.'))
+  .map(f => path.resolve(appFolder, f))[0]
+
+// Create vite.config.js file if not exists
+if (!viteConfigFile) {
+  viteConfigFile = path.resolve(appFolder, 'vite.config.js')
+  fs.writeFileSync(viteConfigFile, 'export default {}')
+}
 
 // Create package.json file if not exists
 if (!fs.existsSync(packageFile)) fs.writeFileSync(packageFile, '{}')
@@ -32,6 +48,24 @@ const nextPackageFileJson = {
   }
 }
 fs.writeJsonSync(packageFile, nextPackageFileJson, { spaces: 2 })
+
+// Add define global setting to the vite config file
+let viteConfigFileContent = fs.readFileSync(viteConfigFile, { encoding: 'utf8' })
+const regexStartOfConfig = /(export(.*)(\{))/
+const regexStartOfDefine = /(define:( )*\{)/
+const regexStartOfGlobal = /(global:( )*\{)/
+const defineStr = `
+  define: {
+  },`
+const globalStr = `
+    global: {},`
+if (!viteConfigFileContent.match(regexStartOfDefine)) {
+  viteConfigFileContent = viteConfigFileContent.replace(regexStartOfConfig, `$1${defineStr}`)
+}
+if (!viteConfigFileContent.match(regexStartOfGlobal)) {
+  viteConfigFileContent = viteConfigFileContent.replace(regexStartOfDefine, `$1${globalStr}`)
+}
+fs.writeFileSync(viteConfigFile, viteConfigFileContent)
 
 // Log success
 console.log('✅ You can start your backend with "npm run backend"')
